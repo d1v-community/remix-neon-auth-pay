@@ -17,6 +17,7 @@ The project currently includes two main API areas:
   - [Verify Login](#verify-login)
   - [Logout](#logout)
   - [Get Current User](#get-current-user)
+  - [Sync Auth Cookie](#sync-auth-cookie)
 - [Payment Endpoints](#payment-endpoints)
   - [Create Payment Link](#create-payment-link)
 - [Page-Level Payment Flow](#page-level-payment-flow)
@@ -55,7 +56,8 @@ Authentication is based on JWT login plus server-side cookies.
 
 - Frontend API calls are same-origin
 - The project uses a global fetch interceptor for `/api/*`
-- You should **not manually append** `Authorization` headers in normal frontend usage unless you have a special-case integration
+- Normal page requests can rely on the session cookie
+- The built-in `/pricing` page also restores auth from local `auth-token` and sends `Authorization: Bearer ...` to `/api/auth/me`, `/api/auth/sync-cookie`, and `/api/pay/create`
 
 ### Payment auth requirement
 
@@ -138,12 +140,30 @@ Content-Type: application/json
 }
 ```
 
-**Status: `500 Internal Server Error`**
+**Status: `503 Service Unavailable`**
 
 ```json
 {
   "success": false,
-  "error": "Failed to send verification code"
+  "error": "Verification service database is unavailable."
+}
+```
+
+Or in development when the database is not ready:
+
+```json
+{
+  "success": false,
+  "error": "Database unavailable for verification flow: <database error>. Check DATABASE_URL and run the database migration."
+}
+```
+
+**Status: `502 Bad Gateway`**
+
+```json
+{
+  "success": false,
+  "error": "Failed to send verification email."
 }
 ```
 
@@ -212,6 +232,15 @@ Content-Type: application/json
 {
   "success": false,
   "error": "Invalid input"
+}
+```
+
+**Status: `503 Service Unavailable`**
+
+```json
+{
+  "success": false,
+  "error": "Login database is unavailable."
 }
 ```
 
@@ -285,6 +314,46 @@ Use this endpoint when you need to:
 - check whether the user is logged in
 - hydrate app state after a refresh
 - gate client-side purchase actions
+
+---
+
+## Sync Auth Cookie
+
+Re-issue the auth cookie from a valid bearer token.
+
+```http
+POST /api/auth/sync-cookie
+Authorization: Bearer <jwt-token>
+```
+
+### Success Response
+
+**Status: `200 OK`**
+
+```json
+{
+  "success": true
+}
+```
+
+### Error Response
+
+**Status: `401 Unauthorized`**
+
+```json
+{
+  "success": false,
+  "error": "Unauthorized"
+}
+```
+
+### Usage
+
+Use this endpoint when you need to:
+
+- convert a locally stored token back into a cookie-backed session
+- restore server-rendered auth behavior after client hydration
+- keep same-origin page loads and authenticated API calls aligned
 
 ---
 
@@ -434,7 +503,7 @@ Or, if no checkout URL is returned:
 ### Notes
 
 - This endpoint is useful for custom AI-generated product UIs.
-- The built-in `/pricing` page does **not** need to call this API directly; it can submit a server form and redirect automatically.
+- The built-in `/pricing` page already calls this API from the browser after login is confirmed.
 - If you are building a custom client flow, call this route and then navigate to `checkoutUrl`.
 
 ---
@@ -450,15 +519,18 @@ Displays product cards loaded from the payment backend.
 Behavior:
 
 - fetches products from the payment service
+- highlights the requested `?productId=...` when present
+- otherwise features the first returned product
 - shows warning banners when payment env variables are missing
-- lets logged-in users start checkout
+- restores auth state from the local token when needed
+- lets logged-in users create checkout through `/api/pay/create`
 - sends anonymous users to `/login`
 
 ### `POST /pricing`
 
-Server-side form submission that creates a payment link and redirects immediately to hosted checkout.
+Optional server-side fallback that creates a payment link and redirects immediately to hosted checkout.
 
-This is the default no-JavaScript-complexity purchase flow for the template UI.
+The current built-in UI does not submit a form to this route, but the action remains available if you want a no-JavaScript or server-driven checkout variant.
 
 ### `GET /pay/success`
 
@@ -602,15 +674,15 @@ window.location.href = data.checkoutUrl;
 
 ### Remix Form Flow on `/pricing`
 
-The built-in pricing page already supports a simpler flow:
+The current built-in pricing page uses a client-driven checkout flow:
 
 1. user logs in
-2. user clicks **Buy now**
-3. form posts to `/pricing`
-4. server creates payment link
-5. server redirects to hosted checkout
+2. page restores auth with `/api/auth/me` when needed
+3. user clicks **Buy membership**
+4. browser posts to `/api/pay/create`
+5. client redirects to hosted checkout
 
-This is the recommended default for template-based app generation because it keeps business logic on the server.
+The checkout link is still created server-side, but the page no longer depends on a form post or a fixed env-driven product id.
 
 ---
 
@@ -681,6 +753,7 @@ The template currently exposes:
 - `POST /api/auth/verify-login`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
+- `POST /api/auth/sync-cookie`
 
 ### Payment API
 
@@ -689,8 +762,11 @@ The template currently exposes:
 ### Payment Pages
 
 - `GET /pricing`
-- `POST /pricing`
 - `GET /pay/success`
 - `GET /pay/cancel`
+
+Optional server-side fallback:
+
+- `POST /pricing`
 
 These endpoints provide a strong default foundation for AI-driven template expansion: authentication, payment initiation, and post-checkout routing are already in place, while project-specific business logic can be layered on top.

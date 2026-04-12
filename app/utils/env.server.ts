@@ -12,7 +12,6 @@ const envSchema = z.object({
 	PAY_BASE_URL: z.string().url().optional(),
 	PAY_API_BASE_URL: z.string().url().optional(),
 	PAY_API_TOKEN: z.string().optional(),
-	PAY_DEFAULT_PRODUCT_ID: z.string().optional(),
 	PAY_SUCCESS_URL: z.string().url().optional(),
 	PAY_CANCEL_URL: z.string().url().optional(),
 });
@@ -57,9 +56,6 @@ export const env = {
 	PAY_API_TOKEN: parsed.success
 		? parsed.data.PAY_API_TOKEN
 		: process.env.PAY_API_TOKEN,
-	PAY_DEFAULT_PRODUCT_ID: parsed.success
-		? parsed.data.PAY_DEFAULT_PRODUCT_ID
-		: process.env.PAY_DEFAULT_PRODUCT_ID,
 	PAY_SUCCESS_URL: parsed.success
 		? parsed.data.PAY_SUCCESS_URL
 		: process.env.PAY_SUCCESS_URL,
@@ -113,8 +109,4 @@ export function getPaymentSuccessUrl(): string {
 
 export function getPaymentCancelUrl(): string {
 	return env.PAY_CANCEL_URL ?? `${env.APP_URL}/pay/cancel`;
-}
-
-export function getDefaultPaymentHubProductId(): string | null {
-	return env.PAY_DEFAULT_PRODUCT_ID ?? null;
 }

@@ -102,6 +102,7 @@ That makes this repository a good foundation for:
 | `POST` | `/api/auth/verify-login` | Verify code and sign in        |
 | `POST` | `/api/auth/logout`       | Logout current user            |
 | `GET`  | `/api/auth/me`           | Get current authenticated user |
+| `POST` | `/api/auth/sync-cookie`  | Re-issue auth cookie from token |
 | `POST` | `/api/pay/create`        | Create hosted payment link     |
 
 ---
@@ -113,10 +114,11 @@ The current template already includes a basic hosted checkout flow:
 1. The app loads products from the payment provider
 2. The user logs in
 3. The user visits `/pricing`
-4. The user clicks **Buy now**
-5. The server creates a hosted checkout link
-6. The user is redirected to the payment page
-7. After checkout, the user returns to:
+4. `/pricing` highlights `?productId=...` when provided, otherwise it uses the first returned product
+5. The user clicks **Buy membership**
+6. The page calls `/api/pay/create` and receives a hosted checkout link
+7. The user is redirected to the payment page
+8. After checkout, the user returns to:
    - `/pay/success`, or
    - `/pay/cancel`
 
@@ -172,7 +174,7 @@ Optional payment:
 
 ```env
 PAY_BASE_URL=https://pay.d1v.ai/api
-PAY_API_TOKEN=your_payment_api_token
+PAY_API_TOKEN=your_server_side_payment_api_token
 PAY_SUCCESS_URL=http://localhost:5173/pay/success
 PAY_CANCEL_URL=http://localhost:5173/pay/cancel
 ```
@@ -331,7 +333,7 @@ Your platform should ideally:
 ## Project structure
 
 ```text
-remix-neon-auth-template/
+remix-neon-auth-pay/
 ├── app/
 │   ├── components/
 │   ├── constants/
@@ -346,6 +348,7 @@ remix-neon-auth-template/
 │   │   ├── api.auth.verify-login.ts
 │   │   ├── api.auth.logout.ts
 │   │   ├── api.auth.me.ts
+│   │   ├── api.auth.sync-cookie.ts
 │   │   └── api.pay.create.ts
 │   ├── services/
 │   │   ├── jwt.server.ts
@@ -463,6 +466,7 @@ The current integration is a strong starting point, but most production apps sho
 - Keep `DATABASE_URL` server-side
 - Keep `JWT_SECRET` private
 - Keep `PAY_API_TOKEN` server-side only
+- `PAY_DEFAULT_PRODUCT_ID` and `PAY_USER_ID` are not required by this template
 - Keep return URLs aligned with the deployed domain
 - Treat redirect pages as UX only, not as full payment verification
 

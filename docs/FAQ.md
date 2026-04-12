@@ -238,6 +238,8 @@ The pricing page loads products from Payment Hub and displays:
 - billing type
 - active/inactive state
 
+It features the product from `?productId=...` when present. If no query param is provided, it uses the first product returned by the payment backend.
+
 If the user is logged in, they can start checkout directly.
 If not, they are prompted to log in first.
 
@@ -245,7 +247,7 @@ If not, they are prompted to log in first.
 
 ### How is checkout created?
 
-The server creates a hosted payment link through the payment service layer, then either:
+The built-in pricing page creates checkout by calling `/api/pay/create` after confirming the current user. The server then creates a hosted payment link through the payment service layer and either:
 
 - redirects the user to the checkout URL from the `/pricing` page flow, or
 - returns the checkout URL as JSON from `/api/pay/create`
@@ -263,6 +265,8 @@ At minimum, payment integration typically needs:
 
 - `PAY_BASE_URL`
 - `PAY_API_TOKEN`
+
+You do not need `PAY_DEFAULT_PRODUCT_ID` or `PAY_USER_ID` for this template. Product selection comes from the backend catalog, and buyer identity comes from the authenticated app user.
 
 Optional payment redirect customization:
 

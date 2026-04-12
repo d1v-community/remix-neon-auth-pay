@@ -83,10 +83,12 @@ The built-in payment flow is:
 1. user logs in
 2. user opens `/pricing`
 3. app loads products from the payment service
-4. user clicks **Buy now**
-5. server creates a payment link
-6. user is redirected to hosted checkout
-7. payment platform redirects user to:
+4. `/pricing` features `?productId=...` when present, otherwise the first product
+5. user clicks **Buy membership**
+6. app calls `/api/pay/create`
+7. server creates a payment link
+8. user is redirected to hosted checkout
+9. payment platform redirects user to:
    - `/pay/success`, or
    - `/pay/cancel`
 
@@ -109,13 +111,15 @@ Main responsibilities:
 
 - load products
 - render pricing information
+- feature the requested product or default to the first returned product
 - show missing-config warnings
+- restore auth state when a local token is present
 - let authenticated users initiate checkout
 - prompt anonymous users to log in
 
 ### `POST /pricing`
 
-Handles form-based checkout creation.
+Handles optional form-based checkout creation.
 
 Main responsibilities:
 
@@ -124,7 +128,7 @@ Main responsibilities:
 - create payment link
 - redirect to hosted checkout URL
 
-This is the default payment action used by the built-in UI.
+The current built-in UI uses `/api/pay/create` instead, but this server action remains available as a fallback pattern.
 
 ### `POST /api/pay/create`
 
@@ -309,20 +313,21 @@ The template then either:
 
 ## Built-In Pricing Page Flow
 
-The built-in pricing page gives you a default checkout flow without requiring a custom frontend integration.
+The built-in pricing page gives you a default checkout flow without requiring a fixed product id in environment variables.
 
 ### How it works
 
 1. page loader fetches products from payment backend
-2. product cards are rendered
-3. user clicks **Buy now**
-4. form posts back to `/pricing`
-5. server creates payment link
-6. server redirects to hosted checkout
+2. the page features the requested `productId` or defaults to the first product
+3. client-side auth is refreshed when a local token exists
+4. user clicks **Buy membership**
+5. browser calls `/api/pay/create`
+6. server creates payment link
+7. browser redirects to hosted checkout
 
 ### Why this is a good template default
 
-It keeps purchase logic mostly on the server, which is beneficial because:
+It keeps payment link creation on the server, which is beneficial because:
 
 - secrets stay server-side
 - there is less client complexity
@@ -331,11 +336,11 @@ It keeps purchase logic mostly on the server, which is beneficial because:
 
 ### When to keep this flow
 
-Use the built-in form flow if you want:
+Use the built-in pricing page flow if you want:
 
-- the simplest hosted checkout integration
+- a simple hosted checkout integration
 - low frontend complexity
-- server-controlled purchase behavior
+- product selection from the backend catalog
 - a stable default for AI-generated project variants
 
 ---

@@ -265,10 +265,12 @@ The current implementation adds:
 The deployed flow works like this:
 
 1. The app loads products from the payment service.
-2. A logged-in user clicks a purchase button on `/pricing`.
-3. The server creates a hosted checkout link through the payment API.
-4. The user is redirected to the hosted checkout page.
-5. After checkout, the payment platform redirects back to:
+2. `/pricing` features the requested `productId` or defaults to the first returned product.
+3. A logged-in user clicks a purchase button on `/pricing`.
+4. The browser calls `/api/pay/create`.
+5. The server creates a hosted checkout link through the payment API.
+6. The user is redirected to the hosted checkout page.
+7. After checkout, the payment platform redirects back to:
    - `/pay/success`, or
    - `/pay/cancel`
 

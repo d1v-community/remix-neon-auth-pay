@@ -68,7 +68,7 @@ This separation is intentional so you can replace or extend one subsystem withou
 ## Directory Tree
 
 ```text
-remix-neon-auth-template/
+remix-neon-auth-pay/
 │
 ├── app/                                # Main application source
 │   ├── components/                     # Shared UI components
@@ -90,6 +90,7 @@ remix-neon-auth-template/
 │   │   ├── api.auth.verify-login.ts    # Verify code and sign in user
 │   │   ├── api.auth.logout.ts          # Logout endpoint
 │   │   ├── api.auth.me.ts              # Current user endpoint
+│   │   ├── api.auth.sync-cookie.ts     # Re-issue auth cookie from bearer token
 │   │   └── api.pay.create.ts           # Create hosted payment link
 │   │
 │   ├── services/                       # Business logic and third-party integrations
@@ -357,9 +358,11 @@ This is where page routes and backend API endpoints live.
 **Key responsibilities**:
 
 - loads product catalog from the payment service
+- features the requested `productId` or defaults to the first product
 - shows environment/payment warnings when configuration is incomplete
+- restores auth from local token when needed
 - requires authentication before purchase
-- creates payment links server-side
+- creates payment links through `/api/pay/create`
 
 **Why it matters**:
 This route is the main UI entry point for the newly added payment system.
@@ -421,6 +424,7 @@ Serves the site favicon through Remix routing conventions.
 - accept user email
 - generate/send verification code
 - support passwordless login initiation
+- return a `503` when the verification store is unavailable
 
 ---
 
@@ -433,6 +437,7 @@ Serves the site favicon through Remix routing conventions.
 - validate submitted verification code
 - create user session
 - return auth information to the client
+- return a `503` when the login store is unavailable
 
 ---
 
@@ -455,6 +460,19 @@ Serves the site favicon through Remix routing conventions.
 
 - return current authenticated user
 - support session-aware UI initialization
+- support `/pricing` client-side auth restoration
+
+---
+
+#### `app/routes/api.auth.sync-cookie.ts`
+
+**Route**: `/api/auth/sync-cookie`
+
+**Purpose**:
+
+- accept a bearer token from the current app session
+- re-issue cookie-based auth headers
+- keep client-restored auth aligned with server-rendered requests
 
 ---
 
@@ -471,6 +489,7 @@ Serves the site favicon through Remix routing conventions.
 
 **Expected use cases**:
 
+- built-in `/pricing` checkout button
 - custom frontend checkout button
 - AI-generated flows that need a direct API integration path
 - decoupled purchase initiation from a non-form client

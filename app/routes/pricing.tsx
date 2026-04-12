@@ -5,7 +5,8 @@ import {
 	type MetaFunction,
 	redirect,
 } from "@remix-run/node";
-import { Form, Link, useLoaderData, useNavigation } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { AppFooter } from "~/components/AppFooter";
 import { AppHeader } from "~/components/AppHeader";
 import { APP_TITLE } from "~/constants/app";
@@ -21,7 +22,6 @@ import {
 import { getUserFromRequest, requireUser } from "~/utils/auth.server";
 import {
 	getEnvWarningMessage,
-	getDefaultPaymentHubProductId,
 	getPaymentCancelUrl,
 	getPaymentHubConfigWarningMessage,
 	getPaymentSuccessUrl,
@@ -43,15 +43,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const paymentWarning = getPaymentHubConfigWarningMessage();
 	const url = new URL(request.url);
 	const requestedProductId = url.searchParams.get("productId")?.trim() || null;
-	const defaultProductId = getDefaultPaymentHubProductId();
 
 	try {
 		const products = await listPaymentHubProducts();
 		const featuredProduct =
 			products.find((product) => product.id === requestedProductId) ??
-			(defaultProductId
-				? products.find((product) => product.id === defaultProductId)
-				: null) ??
 			products[0] ??
 			null;
 
@@ -59,7 +55,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			user,
 			products,
 			featuredProductId: featuredProduct?.id ?? null,
-			defaultProductId,
 			envWarning,
 			paymentWarning,
 			loadError: null,
@@ -74,7 +69,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			user,
 			products: [] as PaymentHubProduct[],
 			featuredProductId: null,
-			defaultProductId,
 			envWarning,
 			paymentWarning,
 			loadError: message,
@@ -176,6 +170,22 @@ function getProductPrice(product: PaymentHubProduct) {
 	return product.price ?? product.prices?.[0] ?? null;
 }
 
+function getDisplayProductName(product: PaymentHubProduct) {
+	const raw = String(product.name ?? "").trim();
+	if (!raw || /remix|template|pricing/i.test(raw)) {
+		return "Membership";
+	}
+	return raw;
+}
+
+function getDisplayProductDescription(product: PaymentHubProduct) {
+	const raw = String(product.description ?? "").trim();
+	if (!raw || /remix|template|smoke|local pricing|payment hub/i.test(raw)) {
+		return "Become a member. Full access starts now.";
+	}
+	return raw;
+}
+
 function ProductCard({
 	product,
 	isFeatured,
@@ -197,10 +207,10 @@ function ProductCard({
 				<div className="flex items-start justify-between gap-3">
 					<div>
 						<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
-							{product.name}
+							{getDisplayProductName(product)}
 						</h2>
 						<p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-							{product.description || "Ready to use with the Payment Hub API."}
+							{getDisplayProductDescription(product)}
 						</p>
 					</div>
 
@@ -260,7 +270,6 @@ export default function PricingPage() {
 		user,
 		products,
 		featuredProductId,
-		defaultProductId,
 		envWarning,
 		paymentWarning,
 		loadError,
@@ -268,9 +277,44 @@ export default function PricingPage() {
 		useLoaderData<typeof loader>();
 	const navigation = useNavigation();
 	const isSubmitting = navigation.state === "submitting";
+	const [clientUser, setClientUser] = useState(user);
+	const [checkoutLoading, setCheckoutLoading] = useState(false);
+	const [checkoutError, setCheckoutError] = useState("");
 	const featuredProduct =
 		products.find((product) => product.id === featuredProductId) ?? null;
 	const featuredPrice = featuredProduct ? getProductPrice(featuredProduct) : null;
+	const effectiveUser = clientUser ?? user;
+
+	useEffect(() => {
+		const token = localStorage.getItem("auth-token");
+		if (!token) {
+			setClientUser(user);
+			return;
+		}
+
+		fetch("/api/auth/me", {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		})
+			.then((response) => (response.ok ? response.json() : null))
+			.then((data) => {
+				if (data?.authenticated) {
+					setClientUser(data.user);
+					return fetch("/api/auth/sync-cookie", {
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}).catch(() => null);
+				}
+				setClientUser(null);
+				return null;
+			})
+			.catch(() => {
+				// noop
+			});
+	}, [user]);
 
 	const handleLogout = async () => {
 		try {
@@ -282,6 +326,43 @@ export default function PricingPage() {
 				// noop
 			}
 			window.location.href = "/login";
+		}
+	};
+
+	const handleCheckout = async (productId: string) => {
+		const token = localStorage.getItem("auth-token");
+		if (!token) {
+			window.location.href = "/login";
+			return;
+		}
+
+		setCheckoutError("");
+		setCheckoutLoading(true);
+
+		try {
+			const response = await fetch("/api/pay/create", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({ productId }),
+			});
+
+			const data = await response.json();
+			if (!response.ok || !data?.success || !data?.checkoutUrl) {
+				throw new Error(data?.error || "Failed to create checkout link.");
+			}
+
+			window.location.href = data.checkoutUrl;
+		} catch (error) {
+			setCheckoutError(
+				error instanceof Error
+					? error.message
+					: "Failed to create checkout link.",
+			);
+		} finally {
+			setCheckoutLoading(false);
 		}
 	};
 
@@ -299,19 +380,20 @@ export default function PricingPage() {
 				</div>
 			) : null}
 
-			<AppHeader user={user} onLogout={handleLogout} />
+			<AppHeader user={effectiveUser} onLogout={handleLogout} />
 
 			<main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 				<section className="mx-auto max-w-3xl text-center">
 					<div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300">
-						Payment Hub Pricing
+						Membership
 					</div>
 					<h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-5xl">
-						Pricing details with a ready-to-pay checkout flow
+						{featuredPrice
+							? `Become a member for ${formatAmount(featuredPrice)}`
+							: "Become a member"}
 					</h1>
 					<p className="mt-4 text-base leading-7 text-slate-600 dark:text-slate-400 sm:text-lg">
-						The header now lands on a usable pricing page. If a default product is
-						configured, it is opened here directly and can be purchased immediately.
+						One price. Instant access. Checkout in seconds.
 					</p>
 
 					<div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -321,9 +403,12 @@ export default function PricingPage() {
 						>
 							Back to home
 						</Link>
-						{user ? (
+						{effectiveUser ? (
 							<span className="rounded-xl bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-								Logged in as {user.displayName || user.username || user.email}
+								Ready to checkout as{" "}
+								{effectiveUser.displayName ||
+									effectiveUser.username ||
+									effectiveUser.email}
 							</span>
 						) : (
 							<Link
@@ -356,16 +441,13 @@ export default function PricingPage() {
 						<div className="grid gap-8 px-6 py-8 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
 							<div>
 								<div className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-									{featuredProduct.id === defaultProductId
-										? "Default pricing offer"
-										: "Selected pricing offer"}
+									Member access
 								</div>
 								<h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-									{featuredProduct.name}
+									{getDisplayProductName(featuredProduct)}
 								</h2>
 								<p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">
-									{featuredProduct.description ||
-										"This offer was initialized for the project automatically and is ready for checkout."}
+									{getDisplayProductDescription(featuredProduct)}
 								</p>
 
 								<div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -387,11 +469,11 @@ export default function PricingPage() {
 									</div>
 									<div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/60">
 										<div className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-											Product ID
+											Access
 										</div>
-										<code className="mt-2 block truncate text-sm text-slate-900 dark:text-slate-100">
-											{featuredProduct.id}
-										</code>
+										<div className="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">
+											Member benefits unlocked
+										</div>
 									</div>
 								</div>
 							</div>
@@ -404,27 +486,25 @@ export default function PricingPage() {
 									{formatAmount(featuredPrice)}
 								</div>
 								<p className="mt-3 text-sm leading-6 text-white/70 dark:text-slate-600">
-									{user
-										? "This checkout will be created for the current signed-in user."
+									{effectiveUser
+										? "Checkout opens instantly for your signed-in account."
 										: "Login first, then return here to create a checkout link instantly."}
 								</p>
 
 								<div className="mt-6">
-									{user ? (
-										<Form method="post">
-											<input
-												type="hidden"
-												name="productId"
-												value={featuredProduct.id}
-											/>
-											<button
-												type="submit"
-												disabled={isSubmitting || featuredProduct.active === false}
-												className="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-800"
-											>
-												{isSubmitting ? "Creating checkout..." : "Pay this price"}
-											</button>
-										</Form>
+									{effectiveUser ? (
+										<button
+											type="button"
+											onClick={() => void handleCheckout(featuredProduct.id)}
+											disabled={
+												checkoutLoading ||
+												isSubmitting ||
+												featuredProduct.active === false
+											}
+											className="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-800"
+										>
+											{checkoutLoading ? "Opening checkout..." : "Buy membership"}
+										</button>
 									) : (
 										<Link
 											to="/login"
@@ -434,6 +514,12 @@ export default function PricingPage() {
 										</Link>
 									)}
 								</div>
+
+								{checkoutError ? (
+									<div className="mt-4 rounded-2xl border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100 dark:border-red-300/30 dark:bg-red-500/10 dark:text-red-700">
+										{checkoutError}
+									</div>
+								) : null}
 							</div>
 						</div>
 					</section>

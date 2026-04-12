@@ -272,18 +272,24 @@ PAY_BASE_URL=https://your-payment-gateway.example.com/api
 **Example**:
 
 ```env
-PAY_API_TOKEN=your_payment_api_token
+PAY_API_TOKEN=your_server_side_payment_api_token
 ```
 
 **Used for**:
 
 - Server-to-server authentication with Payment Hub
 
+**Not used for**:
+
+- selecting a default product
+- storing an app-side payment user id
+
 **Important**:
 
 - Keep this secret
 - Never expose it in browser code
 - Inject it only in server runtime environments
+- The built-in `/pricing` page reads products dynamically, so `PAY_DEFAULT_PRODUCT_ID` and `PAY_USER_ID` are not required
 
 ---
 
