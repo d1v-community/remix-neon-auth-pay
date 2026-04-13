@@ -6,11 +6,12 @@ import { getEnvWarningMessage } from "~/utils/env.server";
 import { AppHeader } from "~/components/AppHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { DevLoadingCard } from "~/components/DevLoadingCard";
+import { SITE_CONFIG } from "~/constants/site";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Home - Remix + Neon Auth" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: `Home - ${SITE_CONFIG.appTitle}` },
+    { name: "description", content: SITE_CONFIG.siteDescription },
   ];
 };
 

@@ -2,6 +2,7 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse, 
 import { useEffect } from "react";
 import tailwindStyles from "./tailwind.css?url";
 import { APP_TITLE } from "~/constants/app";
+import { SITE_CONFIG } from "~/constants/site";
 
 export const links = () => [
   { rel: "stylesheet", href: tailwindStyles },
@@ -10,7 +11,7 @@ export const links = () => [
 export const meta = () => {
   return [
     { title: APP_TITLE },
-    { name: "description", content: "Email verification login with Remix and Neon" },
+    { name: "description", content: SITE_CONFIG.siteDescription },
   ];
 };
 

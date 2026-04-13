@@ -3,13 +3,14 @@ import { Link, useSearchParams } from "@remix-run/react";
 import { AppFooter } from "~/components/AppFooter";
 import { AppHeader } from "~/components/AppHeader";
 import { APP_TITLE } from "~/constants/app";
+import { SITE_CONFIG } from "~/constants/site";
 
 export const meta: MetaFunction = () => {
 	return [
 		{ title: `Payment Success - ${APP_TITLE}` },
 		{
 			name: "description",
-			content: "Your payment was completed successfully.",
+			content: SITE_CONFIG.paymentSuccess.description,
 		},
 	];
 };
@@ -79,15 +80,13 @@ export default function PaySuccessPage() {
 
 					<div className="mt-6 text-center">
 						<p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300">
-							Payment completed
+							{SITE_CONFIG.paymentSuccess.eyebrow}
 						</p>
 						<h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl">
-							Thanks, your checkout was successful
+							{SITE_CONFIG.paymentSuccess.title}
 						</h1>
 						<p className="mt-4 text-base leading-7 text-slate-600 dark:text-slate-400">
-							Your payment has been submitted successfully. If you are selling
-							digital access, memberships, or credits, this is the place where
-							you can guide the buyer to the next step.
+							{SITE_CONFIG.paymentSuccess.description}
 						</p>
 					</div>
 
@@ -100,13 +99,12 @@ export default function PaySuccessPage() {
 
 					<div className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-5 dark:border-sky-900 dark:bg-sky-950/30">
 						<h2 className="text-sm font-semibold text-blue-900 dark:text-sky-200">
-							Suggested next steps for this template
+							{SITE_CONFIG.paymentSuccess.nextStepsTitle}
 						</h2>
 						<ul className="mt-3 space-y-2 text-sm leading-6 text-blue-800 dark:text-sky-300">
-							<li>• Sync successful payments into your own order table</li>
-							<li>• Grant product access or activate the user subscription</li>
-							<li>• Show transaction history in a user dashboard</li>
-							<li>• Add webhook verification for automatic fulfillment</li>
+							{SITE_CONFIG.paymentSuccess.nextSteps.map((item) => (
+								<li key={item}>• {item}</li>
+							))}
 						</ul>
 					</div>
 
@@ -115,13 +113,13 @@ export default function PaySuccessPage() {
 							to="/pricing"
 							className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-700 dark:bg-sky-500 dark:hover:bg-sky-600"
 						>
-							Buy another plan
+							{SITE_CONFIG.paymentSuccess.primaryButtonLabel}
 						</Link>
 						<Link
 							to="/"
 							className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
 						>
-							Back to home
+							{SITE_CONFIG.paymentSuccess.secondaryButtonLabel}
 						</Link>
 					</div>
 				</div>

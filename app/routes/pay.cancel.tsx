@@ -2,13 +2,14 @@ import type { MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { AppFooter } from "~/components/AppFooter";
 import { APP_TITLE } from "~/constants/app";
+import { SITE_CONFIG } from "~/constants/site";
 
 export const meta: MetaFunction = () => {
 	return [
 		{ title: `Payment Cancelled - ${APP_TITLE}` },
 		{
 			name: "description",
-			content: "The checkout flow was cancelled before payment completion.",
+			content: SITE_CONFIG.paymentCancel.description,
 		},
 	];
 };
@@ -37,27 +38,24 @@ export default function PayCancelPage() {
 
 					<div className="mt-6 text-center">
 						<p className="text-sm font-medium uppercase tracking-[0.2em] text-amber-700 dark:text-amber-300">
-							Checkout cancelled
+							{SITE_CONFIG.paymentCancel.eyebrow}
 						</p>
 						<h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl">
-							Your payment was not completed
+							{SITE_CONFIG.paymentCancel.title}
 						</h1>
 						<p className="mt-4 text-base leading-7 text-slate-600 dark:text-slate-400">
-							You exited the checkout flow before finishing payment. No worries
-							— you can return to the pricing page and try again whenever you
-							are ready.
+							{SITE_CONFIG.paymentCancel.description}
 						</p>
 					</div>
 
 					<div className="mt-8 rounded-2xl bg-slate-50 p-5 text-sm leading-6 text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
 						<p className="font-medium text-slate-900 dark:text-slate-100">
-							Common reasons you might see this page:
+							{SITE_CONFIG.paymentCancel.reasonsTitle}
 						</p>
 						<ul className="mt-3 list-disc space-y-1.5 pl-5">
-							<li>You clicked back during checkout.</li>
-							<li>You closed the hosted payment page.</li>
-							<li>The payment method was not confirmed.</li>
-							<li>You intentionally cancelled before paying.</li>
+							{SITE_CONFIG.paymentCancel.reasons.map((item) => (
+								<li key={item}>{item}</li>
+							))}
 						</ul>
 					</div>
 
@@ -66,13 +64,13 @@ export default function PayCancelPage() {
 							to="/pricing"
 							className="inline-flex flex-1 items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-700 dark:bg-sky-500 dark:hover:bg-sky-600"
 						>
-							Return to pricing
+							{SITE_CONFIG.paymentCancel.primaryButtonLabel}
 						</Link>
 						<Link
 							to="/"
 							className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
 						>
-							Go to homepage
+							{SITE_CONFIG.paymentCancel.secondaryButtonLabel}
 						</Link>
 					</div>
 				</div>

@@ -1,260 +1,92 @@
-export const DEV_LOADING_CARD_TEMPLATE_ID = "REPLACE_DEV_LOADING_CARD";
+import { Link } from "@remix-run/react";
+import { SITE_CONFIG } from "~/constants/site";
 
 export function DevLoadingCard() {
+  const surface = SITE_CONFIG.templateSurface;
+
   return (
     <section
-      data-template={DEV_LOADING_CARD_TEMPLATE_ID}
-      className="h-full w-full"
+      data-template={surface.templateId}
+      className="relative isolate overflow-hidden bg-slate-950 text-white"
     >
-      <div className="flex h-full w-full items-center justify-center px-4 py-10">
-        <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-xl shadow-slate-200/60 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90 dark:shadow-slate-950/40">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
-                <span className="mr-1 h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500 dark:bg-emerald-400" />
-                template
-              </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">
-                Replace <span className="font-medium">DevLoadingCard</span> with your feature.
-              </span>
-            </div>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-              {DEV_LOADING_CARD_TEMPLATE_ID}
-            </span>
-          </div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.22),_transparent_38%),radial-gradient(circle_at_70%_25%,_rgba(16,185,129,0.18),_transparent_28%),linear-gradient(180deg,_rgba(15,23,42,0.45),_rgba(2,6,23,0.92))]" />
+      <div className="absolute inset-y-0 right-0 w-[42rem] max-w-full bg-[linear-gradient(135deg,_rgba(59,130,246,0.14),_transparent_45%,_rgba(16,185,129,0.10))]" />
 
-          <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 px-4 py-6 dark:border-slate-800 dark:bg-slate-950/80">
-            <svg
-              viewBox="0 0 320 160"
-              className="h-40 w-full text-slate-200"
-              role="img"
-              aria-label="Placeholder template under construction"
+      <div className="relative mx-auto grid min-h-[calc(100vh-120px)] max-w-7xl gap-14 px-4 py-16 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8 lg:py-24">
+        <div className="flex flex-col justify-center">
+          <div className="inline-flex w-fit items-center rounded-full border border-white/15 bg-white/8 px-3 py-1 text-xs font-medium uppercase tracking-[0.24em] text-sky-200">
+            {SITE_CONFIG.home.badge}
+          </div>
+          <h1 className="mt-6 max-w-4xl text-5xl font-semibold tracking-tight text-white sm:text-6xl">
+            {SITE_CONFIG.home.headline}
+          </h1>
+          <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
+            {SITE_CONFIG.home.description}
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              to={SITE_CONFIG.home.primaryCtaHref}
+              className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
             >
-              <defs>
-                <linearGradient id="beam" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#22c55e" stopOpacity="0.2" />
-                  <stop offset="40%" stopColor="#22c55e" stopOpacity="0.7" />
-                  <stop offset="100%" stopColor="#22c55e" stopOpacity="0.1" />
-                </linearGradient>
-                <linearGradient id="block" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="1" />
-                  <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.2" />
-                </linearGradient>
-                <linearGradient id="crane" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#facc15" stopOpacity="1" />
-                  <stop offset="100%" stopColor="#eab308" stopOpacity="0.3" />
-                </linearGradient>
-              </defs>
-
-              {/* ground and grid */}
-              <g opacity="0.25">
-                <path d="M16 40H304" stroke="#1e293b" strokeWidth="1" strokeDasharray="2 6" />
-                <path d="M16 80H304" stroke="#1e293b" strokeWidth="1" strokeDasharray="2 6" />
-                <path d="M16 120H304" stroke="#1e293b" strokeWidth="1" strokeDasharray="2 6" />
-              </g>
-              <path d="M16 132H304" stroke="#0f172a" strokeWidth="1.5" />
-
-              {/* crane tower */}
-              <g>
-                <rect x="44" y="32" width="6" height="90" fill="url(#crane)" />
-                <rect
-                  x="44"
-                  y="32"
-                  width="6"
-                  height="90"
-                  fill="none"
-                  stroke="#eab308"
-                  strokeWidth="0.8"
-                />
-                <rect x="50" y="38" width="90" height="5" fill="#facc15" />
-                <rect
-                  x="50"
-                  y="38"
-                  width="90"
-                  height="5"
-                  fill="none"
-                  stroke="#eab308"
-                  strokeWidth="0.8"
-                />
-
-                {/* crane cable and hook with moving block */}
-                <line
-                  x1="120"
-                  y1="43"
-                  x2="120"
-                  y2="90"
-                  stroke="#eab308"
-                  strokeWidth="1"
-                  strokeDasharray="3 3"
-                >
-                  <animate
-                    attributeName="y2"
-                    values="70; 90; 70"
-                    dur="3s"
-                    repeatCount="indefinite"
-                  />
-                </line>
-                <rect x="115" y="90" width="10" height="6" fill="#eab308">
-                  <animate
-                    attributeName="y"
-                    values="66; 88; 66"
-                    dur="3s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
-                <rect x="108" y="96" width="24" height="10" fill="url(#block)">
-                  <animate
-                    attributeName="y"
-                    values="72; 94; 72"
-                    dur="3s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
-              </g>
-
-              {/* hello blocks being stacked */}
-              <g>
-                {/* base beam */}
-                <rect
-                  x="64"
-                  y="118"
-                  width="192"
-                  height="8"
-                  rx="2"
-                  fill="#020617"
-                  stroke="#111827"
-                  strokeWidth="1"
-                />
-                <rect x="64" y="118" width="80" height="8" rx="2" fill="url(#beam)">
-                  <animate
-                    attributeName="width"
-                    values="40; 140; 90; 160; 80"
-                    dur="4s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
-
-                {/* rising blocks hinting "HELLO" */}
-                <rect x="72" y="104" width="12" height="14" rx="2" fill="url(#block)">
-                  <animate
-                    attributeName="height"
-                    values="4; 14; 10; 14"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="y"
-                    values="128; 104; 110; 104"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
-                <rect
-                  x="92"
-                  y="96"
-                  width="12"
-                  height="22"
-                  rx="2"
-                  fill="url(#block)"
-                  opacity="0.9"
-                >
-                  <animate
-                    attributeName="height"
-                    values="6; 22; 18; 22"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="y"
-                    values="126; 96; 104; 96"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
-                <rect
-                  x="112"
-                  y="100"
-                  width="12"
-                  height="18"
-                  rx="2"
-                  fill="url(#block)"
-                  opacity="0.8"
-                >
-                  <animate
-                    attributeName="height"
-                    values="4; 18; 14; 18"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="y"
-                    values="128; 100; 108; 100"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
-                <rect x="132" y="92" width="12" height="26" rx="2" fill="url(#block)">
-                  <animate
-                    attributeName="height"
-                    values="10; 26; 20; 26"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="y"
-                    values="124; 92; 102; 92"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
-                <rect
-                  x="152"
-                  y="100"
-                  width="12"
-                  height="18"
-                  rx="2"
-                  fill="url(#block)"
-                  opacity="0.9"
-                >
-                  <animate
-                    attributeName="height"
-                    values="6; 18; 12; 18"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="y"
-                    values="126; 100; 110; 100"
-                    dur="3.2s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
-              </g>
-
-              {/* placeholder label as blueprint text */}
-              <g>
-                <rect
-                  x="176"
-                  y="40"
-                  width="150"
-                  height="40"
-                  rx="8"
-                  fill="#020617"
-                  stroke="#1f2937"
-                  strokeWidth="1.2"
-                />
-                <text x="188" y="58" fontSize="11" fill="#e5e7eb" letterSpacing="0.12em">
-                  TEMPLATE
-                </text>
-                <text x="188" y="72" fontSize="9" fill="#9ca3af">
-                  replace this component
-                </text>
-              </g>
-            </svg>
+              {SITE_CONFIG.home.primaryCtaLabel}
+            </Link>
+            <Link
+              to={SITE_CONFIG.home.secondaryCtaHref}
+              className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+            >
+              {SITE_CONFIG.home.secondaryCtaLabel}
+            </Link>
           </div>
 
-          <div className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-            This is a full-page placeholder. Swap it out when implementing your feature.
+          <div className="mt-10 grid gap-3 sm:grid-cols-3">
+            {SITE_CONFIG.home.proofPoints.map((item) => (
+              <div
+                key={item}
+                className="border-t border-white/10 pt-3 text-sm leading-6 text-slate-300"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center">
+          <div className="w-full border border-white/10 bg-white/5 p-6 backdrop-blur xl:p-8">
+            <div className="flex items-center justify-between gap-4">
+              <div className="inline-flex items-center rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-emerald-200">
+                {surface.badge}
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.28em] text-slate-500">
+                {surface.templateId}
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <div className="h-px w-full bg-gradient-to-r from-sky-400/0 via-sky-400/50 to-sky-400/0" />
+              <div className="mt-8">
+                <p className="text-sm uppercase tracking-[0.24em] text-sky-200">
+                  Foundation surface
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
+                  {surface.headline}
+                </h2>
+                <p className="mt-4 text-sm leading-7 text-slate-300">
+                  {surface.description}
+                </p>
+              </div>
+
+              <div className="mt-8 space-y-4">
+                {surface.bullets.map((item, index) => (
+                  <div key={item} className="flex items-start gap-4">
+                    <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xs font-medium text-sky-200">
+                      0{index + 1}
+                    </div>
+                    <p className="text-sm leading-6 text-slate-300">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

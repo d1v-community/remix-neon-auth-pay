@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 import { ThemeToggleButton } from "~/components/ThemeToggleButton";
 import { APP_TITLE } from "~/constants/app";
+import { SITE_CONFIG } from "~/constants/site";
 
 export type AppHeaderUser = {
   displayName: string | null;
@@ -33,7 +34,7 @@ export function AppHeader({ user, onLogout }: AppHeaderProps) {
                 to="/pricing"
                 className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
               >
-                Pricing
+                {SITE_CONFIG.navigation.pricingLabel}
               </Link>
             </nav>
 
@@ -58,7 +59,7 @@ export function AppHeader({ user, onLogout }: AppHeaderProps) {
                 to="/login"
                 className="text-sm text-gray-700 hover:text-gray-900 dark:text-slate-200 dark:hover:text-white"
               >
-                Login
+                {SITE_CONFIG.navigation.loginLabel}
               </Link>
             )}
           </div>

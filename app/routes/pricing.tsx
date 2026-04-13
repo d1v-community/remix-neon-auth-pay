@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { AppFooter } from "~/components/AppFooter";
 import { AppHeader } from "~/components/AppHeader";
 import { APP_TITLE } from "~/constants/app";
+import { SITE_CONFIG } from "~/constants/site";
 import {
 	createPaymentHubPaymentLink,
 	listPaymentHubProducts,
@@ -32,7 +33,7 @@ export const meta: MetaFunction = () => {
 		{ title: `Pricing - ${APP_TITLE}` },
 		{
 			name: "description",
-			content: "Browse products and start a checkout flow with Payment Hub.",
+			content: SITE_CONFIG.pricing.description,
 		},
 	];
 };
@@ -173,7 +174,7 @@ function getProductPrice(product: PaymentHubProduct) {
 function getDisplayProductName(product: PaymentHubProduct) {
 	const raw = String(product.name ?? "").trim();
 	if (!raw || /remix|template|pricing/i.test(raw)) {
-		return "Membership";
+		return SITE_CONFIG.pricing.defaultProductName;
 	}
 	return raw;
 }
@@ -181,7 +182,7 @@ function getDisplayProductName(product: PaymentHubProduct) {
 function getDisplayProductDescription(product: PaymentHubProduct) {
 	const raw = String(product.description ?? "").trim();
 	if (!raw || /remix|template|smoke|local pricing|payment hub/i.test(raw)) {
-		return "Become a member. Full access starts now.";
+		return SITE_CONFIG.pricing.defaultProductDescription;
 	}
 	return raw;
 }
@@ -258,7 +259,9 @@ function ProductCard({
 					to={`/pricing?productId=${encodeURIComponent(product.id)}`}
 					className="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
 				>
-					{isFeatured ? "Viewing details" : "View details"}
+					{isFeatured
+						? SITE_CONFIG.pricing.viewingDetailsLabel
+						: SITE_CONFIG.pricing.viewDetailsLabel}
 				</Link>
 			</div>
 		</div>
@@ -273,8 +276,7 @@ export default function PricingPage() {
 		envWarning,
 		paymentWarning,
 		loadError,
-	} =
-		useLoaderData<typeof loader>();
+	} = useLoaderData<typeof loader>();
 	const navigation = useNavigation();
 	const isSubmitting = navigation.state === "submitting";
 	const [clientUser, setClientUser] = useState(user);
@@ -385,15 +387,15 @@ export default function PricingPage() {
 			<main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 				<section className="mx-auto max-w-3xl text-center">
 					<div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300">
-						Membership
+						{SITE_CONFIG.pricing.badge}
 					</div>
 					<h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-5xl">
 						{featuredPrice
-							? `Become a member for ${formatAmount(featuredPrice)}`
-							: "Become a member"}
+							? `${SITE_CONFIG.pricing.headline} ${formatAmount(featuredPrice)}`
+							: SITE_CONFIG.pricing.headline}
 					</h1>
 					<p className="mt-4 text-base leading-7 text-slate-600 dark:text-slate-400 sm:text-lg">
-						One price. Instant access. Checkout in seconds.
+						{SITE_CONFIG.pricing.description}
 					</p>
 
 					<div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -405,7 +407,7 @@ export default function PricingPage() {
 						</Link>
 						{effectiveUser ? (
 							<span className="rounded-xl bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-								Ready to checkout as{" "}
+								{SITE_CONFIG.pricing.readyLabelPrefix}{" "}
 								{effectiveUser.displayName ||
 									effectiveUser.username ||
 									effectiveUser.email}
@@ -415,7 +417,7 @@ export default function PricingPage() {
 								to="/login"
 								className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 dark:bg-sky-500 dark:hover:bg-sky-600"
 							>
-								Login to purchase
+								{SITE_CONFIG.pricing.loginButtonLabel}
 							</Link>
 						)}
 					</div>
@@ -430,8 +432,7 @@ export default function PricingPage() {
 							{loadError}
 						</p>
 						<p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
-							Check your Payment Hub API token and make sure your account
-							already has at least one active product.
+							{SITE_CONFIG.pricing.loadErrorHint}
 						</p>
 					</section>
 				) : null}
@@ -441,7 +442,7 @@ export default function PricingPage() {
 						<div className="grid gap-8 px-6 py-8 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
 							<div>
 								<div className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-									Member access
+									{SITE_CONFIG.pricing.featuredLabel}
 								</div>
 								<h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
 									{getDisplayProductName(featuredProduct)}
@@ -472,7 +473,7 @@ export default function PricingPage() {
 											Access
 										</div>
 										<div className="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">
-											Member benefits unlocked
+											{SITE_CONFIG.pricing.accessLabel}
 										</div>
 									</div>
 								</div>
@@ -480,15 +481,15 @@ export default function PricingPage() {
 
 							<div className="rounded-3xl bg-slate-950 p-6 text-white dark:bg-slate-50 dark:text-slate-950">
 								<div className="text-sm font-medium text-white/70 dark:text-slate-600">
-									Checkout
+									{SITE_CONFIG.pricing.checkoutLabel}
 								</div>
 								<div className="mt-3 text-4xl font-semibold tracking-tight">
 									{formatAmount(featuredPrice)}
 								</div>
 								<p className="mt-3 text-sm leading-6 text-white/70 dark:text-slate-600">
 									{effectiveUser
-										? "Checkout opens instantly for your signed-in account."
-										: "Login first, then return here to create a checkout link instantly."}
+										? SITE_CONFIG.pricing.checkoutUserDescription
+										: SITE_CONFIG.pricing.checkoutGuestDescription}
 								</p>
 
 								<div className="mt-6">
@@ -503,14 +504,16 @@ export default function PricingPage() {
 											}
 											className="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-800"
 										>
-											{checkoutLoading ? "Opening checkout..." : "Buy membership"}
+											{checkoutLoading
+												? "Opening checkout..."
+												: SITE_CONFIG.pricing.buyButtonLabel}
 										</button>
 									) : (
 										<Link
 											to="/login"
 											className="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-800"
 										>
-											Login to continue
+											{SITE_CONFIG.pricing.loginButtonLabel}
 										</Link>
 									)}
 								</div>
@@ -549,12 +552,10 @@ export default function PricingPage() {
 				{!loadError && products.length === 0 ? (
 					<section className="mx-auto mt-10 max-w-3xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
 						<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
-							No products found
+							{SITE_CONFIG.pricing.emptyStateTitle}
 						</h2>
 						<p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-							Create products first in Payment Hub, then refresh this page. Once
-							products are available, this route can immediately act as your
-							pricing and checkout entry page.
+							{SITE_CONFIG.pricing.emptyStateDescription}
 						</p>
 					</section>
 				) : null}
