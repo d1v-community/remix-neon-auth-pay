@@ -72,6 +72,12 @@ That makes this repository a good foundation for:
 - Success and cancel return pages
 - Environment-based payment configuration
 
+### Optional AI concierge
+
+- OpenAI-compatible chat route at `/api/ai/chat`
+- Server-side `D1V_PAI_*` secret handling
+- Homepage assistant panel controlled by site config
+
 ### DX / Platform fit
 
 - TypeScript-first
@@ -103,6 +109,7 @@ That makes this repository a good foundation for:
 | `POST` | `/api/auth/logout`       | Logout current user            |
 | `GET`  | `/api/auth/me`           | Get current authenticated user |
 | `POST` | `/api/auth/sync-cookie`  | Re-issue auth cookie from token |
+| `POST` | `/api/ai/chat`           | Create an AI assistant reply   |
 | `POST` | `/api/pay/create`        | Create hosted payment link     |
 
 ---
@@ -177,6 +184,13 @@ PAY_BASE_URL=https://pay.d1v.ai/api
 PAY_API_TOKEN=your_server_side_payment_api_token
 PAY_SUCCESS_URL=http://localhost:5173/pay/success
 PAY_CANCEL_URL=http://localhost:5173/pay/cancel
+```
+
+Optional AI:
+
+```env
+D1V_PAI_BASE_URL=https://pai.d1v.ai/v1
+D1V_PAI_API_KEY=your_project_level_pai_api_key
 ```
 
 ### 4) Run database migration
@@ -257,6 +271,11 @@ Optional:
 ### Email
 
 - `RESEND_API_KEY`
+
+### AI assistant
+
+- `D1V_PAI_BASE_URL`
+- `D1V_PAI_API_KEY`
 
 ### Payment
 
