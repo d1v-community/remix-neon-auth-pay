@@ -1,6 +1,47 @@
+export type SiteThemeFamily =
+  | "ai"
+  | "business"
+  | "commerce"
+  | "creator"
+  | "education"
+  | "local";
+
+export type SiteThemeLayout =
+  | "command"
+  | "operations"
+  | "editorial"
+  | "academy"
+  | "service";
+
+export type SiteMetric = {
+  value: string;
+  label: string;
+  detail: string;
+};
+
+export type SiteExperiencePanel = {
+  title: string;
+  value: string;
+  detail: string;
+  meta: string;
+};
+
+export type SiteExperienceItem = {
+  title: string;
+  description: string;
+  meta?: string;
+};
+
 export type SiteConfig = {
   appTitle: string;
   siteDescription: string;
+  theme: {
+    family: SiteThemeFamily;
+    layout: SiteThemeLayout;
+    visualThesis: string;
+    contentPlan: string[];
+    interactionThesis: string[];
+  };
   navigation: {
     pricingLabel: string;
     loginLabel: string;
@@ -46,6 +87,29 @@ export type SiteConfig = {
     description: string;
     bullets: string[];
   };
+  heroMetrics: SiteMetric[];
+  showcase: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    panels: SiteExperiencePanel[];
+  };
+  workflow: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    steps: SiteExperienceItem[];
+  };
+  featureSections: Array<{
+    eyebrow: string;
+    title: string;
+    description: string;
+    items: SiteExperienceItem[];
+  }>;
+  faq: Array<{
+    question: string;
+    answer: string;
+  }>;
   aiAssistant?: {
     enabled: boolean;
     badge: string;
@@ -84,6 +148,23 @@ export const SITE_CONFIG: SiteConfig = {
   appTitle: "LaunchPass",
   siteDescription:
     "Membership-ready Remix starter with passwordless auth, Neon data, and hosted checkout.",
+  theme: {
+    family: "commerce",
+    layout: "editorial",
+    visualThesis:
+      "A premium launch surface that keeps the offer clear while exposing enough product depth to feel real.",
+    contentPlan: [
+      "Hero: one paid offer and one immediate action",
+      "Support: show the product operating model",
+      "Detail: explain what ships after checkout",
+      "Final CTA: move the buyer into pricing or login",
+    ],
+    interactionThesis: [
+      "Keep the first viewport poster-like rather than card-heavy.",
+      "Use display surfaces to show how the starter becomes a real product.",
+      "Treat fulfillment and entitlement messaging as part of conversion.",
+    ],
+  },
   navigation: {
     pricingLabel: "Pricing",
     loginLabel: "Login",
@@ -142,6 +223,140 @@ export const SITE_CONFIG: SiteConfig = {
       "Replace placeholder database models with your product schema",
     ],
   },
+  heroMetrics: [
+    {
+      value: "Auth",
+      label: "Already wired",
+      detail: "Passwordless email login is ready to use.",
+    },
+    {
+      value: "Data",
+      label: "Production capable",
+      detail: "Neon and Drizzle provide the persistence layer.",
+    },
+    {
+      value: "Checkout",
+      label: "Hosted flow",
+      detail: "Turn access into revenue without writing payment UI first.",
+    },
+  ],
+  showcase: {
+    eyebrow: "Starter architecture",
+    title: "Use one foundation to launch a paid product with less plumbing and more product work.",
+    description:
+      "The base template is intentionally lean: auth, data, and billing are in place so you can spend your next pass on the market-specific experience.",
+    panels: [
+      {
+        title: "Auth boundary",
+        value: "Passwordless",
+        detail: "Move users from email code to app access without extra identity setup.",
+        meta: "Accounts",
+      },
+      {
+        title: "Database layer",
+        value: "Neon + Drizzle",
+        detail: "Migrations, seeds, and schema work stay close to the app code.",
+        meta: "Persistence",
+      },
+      {
+        title: "Payments",
+        value: "Hosted",
+        detail: "Start with one clean pricing path before adding subscriptions or orders.",
+        meta: "Commerce",
+      },
+      {
+        title: "Environment bootstrap",
+        value: "Project-aware",
+        detail: "Pull generated project env vars into local `.env` without hand-editing secrets.",
+        meta: "DX",
+      },
+    ],
+  },
+  workflow: {
+    eyebrow: "Foundation workflow",
+    title: "Replace only the market layer.",
+    description:
+      "This starter is strongest when you keep the platform rails and swap in your real entities, surfaces, and fulfillment logic.",
+    steps: [
+      {
+        title: "Define your product entities",
+        description: "Replace starter copy with the data model your product actually needs.",
+      },
+      {
+        title: "Map checkout to access",
+        description: "Successful payment should create orders, seats, credits, or memberships.",
+      },
+      {
+        title: "Build the post-purchase state",
+        description: "Success pages are only the first handoff into the real product experience.",
+      },
+    ],
+  },
+  featureSections: [
+    {
+      eyebrow: "What you inherit",
+      title: "The boring but necessary platform work is already here.",
+      description:
+        "Use the foundation to skip setup drift and move straight into product-specific implementation.",
+      items: [
+        {
+          title: "Passwordless auth",
+          description: "JWT session helpers and auth routes are ready to extend.",
+          meta: "Identity",
+        },
+        {
+          title: "Database workflow",
+          description: "Direct `db:migrate` and `db:seed` scripts keep local setup predictable.",
+          meta: "Data",
+        },
+        {
+          title: "Hosted checkout",
+          description: "Pricing and checkout link creation are already connected.",
+          meta: "Payments",
+        },
+      ],
+    },
+    {
+      eyebrow: "What you still build",
+      title: "The product surface is intentionally open.",
+      description:
+        "The template is supposed to disappear under your real experience, schema, and business logic.",
+      items: [
+        {
+          title: "Core workflow",
+          description: "Swap the landing surface for your dashboard, portal, library, or booking flow.",
+          meta: "Experience",
+        },
+        {
+          title: "Entitlements",
+          description: "Persist plan access, credits, reservations, or membership status in your own schema.",
+          meta: "Access",
+        },
+        {
+          title: "Fulfillment",
+          description: "Route successful buyers into onboarding, downloads, appointments, or premium content.",
+          meta: "Ops",
+        },
+      ],
+    },
+  ],
+  faq: [
+    {
+      question: "What should I customize first?",
+      answer:
+        "Replace the homepage experience, define your product entities, and map payment success to a real entitlement model.",
+    },
+    {
+      question: "What should stay shared across derivatives?",
+      answer:
+        "Keep auth, env bootstrap, database workflow, and hosted checkout aligned unless the product truly needs a different primitive.",
+    },
+    {
+      question: "How should this foundation evolve?",
+      answer:
+        "It should stay lean and reusable while industry templates carry stronger design language and domain-specific modules.",
+    },
+  ],
   paymentSuccess: {
     eyebrow: "Payment completed",
     title: "Thanks, your checkout was successful",
