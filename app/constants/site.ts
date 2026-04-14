@@ -147,7 +147,7 @@ export type SiteConfig = {
 export const SITE_CONFIG: SiteConfig = {
   appTitle: "D1V DEMO",
   siteDescription:
-    "Membership-ready Remix starter with passwordless auth, Neon data, and hosted checkout.",
+    "D1V DEMO showcase with login, data, pricing, and checkout-ready product flows.",
   theme: {
     family: "commerce",
     layout: "editorial",
@@ -177,9 +177,9 @@ export const SITE_CONFIG: SiteConfig = {
     headline: "Ship a paid product before the copy deck is even finished.",
     description:
       "Passwordless login, Neon storage, and hosted checkout are already wired. Replace the product layer, keep the platform primitives.",
-    primaryCtaLabel: "Open pricing",
+    primaryCtaLabel: "View demo pricing",
     primaryCtaHref: "/pricing",
-    secondaryCtaLabel: "Login",
+    secondaryCtaLabel: "Enter demo",
     secondaryCtaHref: "/login",
     proofPoints: [
       "Passwordless email auth with JWT session helpers",
@@ -198,8 +198,8 @@ export const SITE_CONFIG: SiteConfig = {
       "Checkout opens instantly for your signed-in account.",
     checkoutGuestDescription:
       "Login first, then return here to create a checkout link instantly.",
-    buyButtonLabel: "Buy membership",
-    loginButtonLabel: "Login to purchase",
+    buyButtonLabel: "Get demo access",
+    loginButtonLabel: "Login for demo access",
     readyLabelPrefix: "Ready to checkout as",
     loadErrorHint:
       "Check your Payment Hub API token and make sure your account already has at least one active product.",
