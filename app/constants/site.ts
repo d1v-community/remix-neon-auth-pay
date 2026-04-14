@@ -145,7 +145,7 @@ export type SiteConfig = {
 };
 
 export const SITE_CONFIG: SiteConfig = {
-  appTitle: "LaunchPass",
+  appTitle: "D1V DEMO",
   siteDescription:
     "Membership-ready Remix starter with passwordless auth, Neon data, and hosted checkout.",
   theme: {
@@ -206,7 +206,7 @@ export const SITE_CONFIG: SiteConfig = {
     emptyStateTitle: "No active products yet",
     emptyStateDescription:
       "Create products in Payment Hub, then refresh this page to turn the checkout flow on.",
-    defaultProductName: "Membership",
+    defaultProductName: "D1V DEMO",
     defaultProductDescription: "Become a member. Full access starts now.",
     viewDetailsLabel: "View details",
     viewingDetailsLabel: "Viewing details",
