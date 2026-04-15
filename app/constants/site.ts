@@ -87,6 +87,16 @@ export type SiteConfig = {
     description: string;
     bullets: string[];
   };
+  login: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    audience: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    emailHint: string;
+    trustPoints: string[];
+  };
   heroMetrics: SiteMetric[];
   showcase: {
     eyebrow: string;
@@ -221,6 +231,22 @@ export const SITE_CONFIG: SiteConfig = {
       "Edit the homepage copy and action flow for your specific buyer",
       "Connect payment success to order, credit, or entitlement creation",
       "Replace placeholder database models with your product schema",
+    ],
+  },
+  login: {
+    eyebrow: "Demo login",
+    title: "Step into the paid product shell and test the full access path.",
+    description:
+      "Use one account entry surface for authentication, pricing handoff, and gated product access without rebuilding the platform layer.",
+    audience: "Builders turning the starter into a real paid product",
+    emailLabel: "Email address",
+    emailPlaceholder: "you@example.com",
+    emailHint:
+      "Use the email tied to your demo account, test buyer, or internal review flow.",
+    trustPoints: [
+      "Passwordless sign-in keeps the first visit light and the return path fast.",
+      "Checkout, entitlement, and account access stay connected to one identity.",
+      "The same shell can become SaaS, content, membership, or service software.",
     ],
   },
   heroMetrics: [
