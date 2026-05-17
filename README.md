@@ -198,7 +198,7 @@ D1V_PAI_API_KEY=your_project_level_pai_api_key
 Preferred workflow:
 
 ```bash
-pnpm run db:migrate:api
+pnpm run db:migrate
 ```
 
 If you intentionally want direct DB mode:
@@ -228,8 +228,8 @@ This repository defaults to **API-based migration mode**.
 ### Recommended
 
 ```bash
-pnpm run db:migrate:api
-pnpm run db:seed:api
+pnpm run db:migrate
+pnpm run db:seed
 ```
 
 ### Optional direct DB mode
@@ -248,7 +248,6 @@ It helps avoid exposing raw database credentials to every local or automation pr
 Required:
 
 - `PROJECT_ID`
-- `OPCODE_API_BASE` or `BACKEND_ADMIN_API_BASE`
 - `AUTH_TOKEN`
 
 Optional:
@@ -307,9 +306,9 @@ pnpm run format
 pnpm run format:fix
 
 pnpm run db:migrate
-pnpm run db:migrate:api
+pnpm run db:migrate
 pnpm run db:seed
-pnpm run db:seed:api
+pnpm run db:seed
 ```
 
 ---
